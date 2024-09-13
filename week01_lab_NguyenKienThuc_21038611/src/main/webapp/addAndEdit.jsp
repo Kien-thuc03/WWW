@@ -10,11 +10,11 @@
 <%@ page import="edu.iuh.fit.week01_lab_nguyenkienthuc_21038611.entities.Account" %>
 <%@ page import="edu.iuh.fit.week01_lab_nguyenkienthuc_21038611.entities.Role" %>
 <%@ page import="java.util.List" %>
-
 <html>
 <head>
     <title>Add/Edit Account</title>
     <style>
+        /* Existing styles */
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: #f0f2f5;
@@ -72,11 +72,21 @@
             background-color: #5a6268;
         }
     </style>
+    <script>
+        function validateForm() {
+            var checkboxes = document.querySelectorAll('input[name="roles"]:checked');
+            if (checkboxes.length === 0) {
+                alert("Please select at least one role.");
+                return false;
+            }
+            return true;
+        }
+    </script>
 </head>
 <body>
 <div class="container">
     <h1><%= request.getParameter("action").equals("edit") ? "Edit Account" : "Add Account" %></h1>
-    <form action="ControlServlet" method="post">
+    <form action="ControlServlet" method="post" onsubmit="return validateForm()">
         <input type="hidden" name="action" value="save<%= request.getParameter("action").substring(0, 1).toUpperCase() + request.getParameter("action").substring(1) %>">
 
         <div class="form-group">
@@ -104,7 +114,7 @@
             <input type="text" id="status" name="status" value="<%= request.getAttribute("account") != null ? ((Account) request.getAttribute("account")).getStatus() : "" %>" required>
         </div>
         <div class="form-group">
-            <label for="roles">Roles</label>
+            <label>Roles</label>
             <input type="checkbox" id="roleUser" name="roles" value="user" <%= request.getAttribute("account") != null && ((Account) request.getAttribute("account")).getRoleNames().contains("user") ? "checked" : "" %>> User
             <input type="checkbox" id="roleAdmin" name="roles" value="administrator" <%= request.getAttribute("account") != null && ((Account) request.getAttribute("account")).getRoleNames().contains("administrator") ? "checked" : "" %>> Administrator
         </div>

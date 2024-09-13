@@ -9,6 +9,7 @@ import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
 import jakarta.persistence.TypedQuery;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class AccountRepository {
 
@@ -36,25 +37,7 @@ public class AccountRepository {
     }
 
     // Phương thức để cập nhật account
-//    public void updateAccount(String accountId, String fullName, String password, String email, String phone, byte status) {
-//        try {
-//            entityManager.getTransaction().begin();
-//            Account account = new Account();
-//            account.setAccountId(accountId);
-//            account.setFullName(fullName);
-//            account.setPassword(password);
-//            account.setEmail(email);
-//            account.setPhone(phone);
-//            account.setStatus(status);
-//            entityManager.merge(account);
-//            entityManager.getTransaction().commit();
-//
-//        } catch (Exception e) {
-//            entityManager.getTransaction().rollback();
-//            e.printStackTrace();
-//        }
-//    }
-    // AccountRepository.java
+
     public void updateAccount(String accountId, String fullName, String password, String email, String phone, byte status, List<String> roleNames) {
         try {
             entityManager.getTransaction().begin();
@@ -66,25 +49,44 @@ public class AccountRepository {
                 account.setPhone(phone);
                 account.setStatus(status);
 
+                // Log current roles
+                System.out.println("Current roles: " + account.getGrantAccesses().stream()
+                        .map(grantAccess -> grantAccess.getRole().getRoleName())
+                        .collect(Collectors.toList()));
 
-                // Add new roles
-                for (String roleName : roleNames) {
-                    Role role = entityManager.createNamedQuery("Role.findByRoleName", Role.class)
-                                             .setParameter("roleName", roleName)
-                                             .getSingleResult();
-                    if (role != null && account.getGrantAccesses().stream().noneMatch(grantAccess -> grantAccess.getRole().getRoleId().equals(role.getRoleId()))) {
-                        GrantAccess grantAccess = new GrantAccess();
-                        GrantAccessId grantAccessId = new GrantAccessId();
-                        grantAccessId.setAccountId(accountId);
-                        grantAccessId.setRoleId(role.getRoleId());
-                        grantAccess.setId(grantAccessId);
-                        grantAccess.setIsGrant(true);
+                // Retrieve current roles
+                List<String> currentRoleNames = account.getGrantAccesses().stream()
+                        .map(grantAccess -> grantAccess.getRole().getRoleName())
+                        .collect(Collectors.toList());
 
-                        grantAccess.setAccount(account);
-                        grantAccess.setRole(role);
-                        entityManager.persist(grantAccess);
+                // Nếu danh sách quyền thay đổi, thực hiện cập nhật
+                if (!currentRoleNames.equals(roleNames)) {
+                    // Xóa các quyền cũ khỏi cơ sở dữ liệu
+                    for (GrantAccess grantAccess : account.getGrantAccesses()) {
+                        entityManager.remove(grantAccess);
+                    }
+                    account.getGrantAccesses().clear(); // Xóa khỏi bộ nhớ
 
-                        account.getGrantAccesses().add(grantAccess);
+                    // Thêm các quyền mới
+                    for (String roleName : roleNames) {
+                        Role role = entityManager.createNamedQuery("Role.findByRoleName", Role.class)
+                                .setParameter("roleName", roleName)
+                                .getSingleResult();
+
+                        if (role != null) {
+                            GrantAccess grantAccess = new GrantAccess();
+                            GrantAccessId grantAccessId = new GrantAccessId();
+                            grantAccessId.setAccountId(accountId);
+                            grantAccessId.setRoleId(role.getRoleId());
+                            grantAccess.setId(grantAccessId);
+                            grantAccess.setIsGrant(true);
+
+                            grantAccess.setAccount(account);
+                            grantAccess.setRole(role);
+
+                            entityManager.persist(grantAccess);
+                            account.getGrantAccesses().add(grantAccess);
+                        }
                     }
                 }
 
@@ -98,6 +100,64 @@ public class AccountRepository {
             e.printStackTrace();
         }
     }
+
+    public void updateRoles(String accountId, List<String> roleNames) {
+        try {
+            entityManager.getTransaction().begin();
+            Account account = entityManager.find(Account.class, accountId);
+            if (account != null) {
+                // Log current roles
+                System.out.println("Current roles: " + account.getGrantAccesses().stream()
+                        .map(grantAccess -> grantAccess.getRole().getRoleName())
+                        .collect(Collectors.toList()));
+
+                // Retrieve current roles
+                List<String> currentRoleNames = account.getGrantAccesses().stream()
+                        .map(grantAccess -> grantAccess.getRole().getRoleName())
+                        .collect(Collectors.toList());
+
+                // Nếu danh sách quyền thay đổi, thực hiện cập nhật
+                if (!currentRoleNames.equals(roleNames)) {
+                    // Xóa các quyền cũ khỏi cơ sở dữ liệu
+                    for (GrantAccess grantAccess : account.getGrantAccesses()) {
+                        entityManager.remove(grantAccess);
+                    }
+                    account.getGrantAccesses().clear(); // Xóa khỏi bộ nhớ
+
+                    // Thêm các quyền mới
+                    for (String roleName : roleNames) {
+                        Role role = entityManager.createNamedQuery("Role.findByRoleName", Role.class)
+                                .setParameter("roleName", roleName)
+                                .getSingleResult();
+
+                        if (role != null) {
+                            GrantAccess grantAccess = new GrantAccess();
+                            GrantAccessId grantAccessId = new GrantAccessId();
+                            grantAccessId.setAccountId(accountId);
+                            grantAccessId.setRoleId(role.getRoleId());
+                            grantAccess.setId(grantAccessId);
+                            grantAccess.setIsGrant(true);
+
+                            grantAccess.setAccount(account);
+                            grantAccess.setRole(role);
+
+                            entityManager.persist(grantAccess);
+                            account.getGrantAccesses().add(grantAccess);
+                        }
+                    }
+                }
+
+                entityManager.merge(account);
+            }
+            entityManager.getTransaction().commit();
+        } catch (Exception e) {
+            if (entityManager.getTransaction().isActive()) {
+                entityManager.getTransaction().rollback();
+            }
+            e.printStackTrace();
+        }
+    }
+
 
     // Phương thức để xóa account theo accountId
     public void deleteAccountById(String accountId) {

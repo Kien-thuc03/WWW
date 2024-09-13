@@ -11,7 +11,8 @@ import org.hibernate.annotations.OnDeleteAction;
 @NamedQueries({
         @NamedQuery(name = "GrantAccess.findAll", query = "select g from GrantAccess g"),
         @NamedQuery(name = "GrantAccess.findById_RoleIdAndId_AccountId", query = "select g from GrantAccess g where g.id.roleId = :roleId and g.id.accountId = :accountId"),
-        @NamedQuery(name = "GrantAccess.findById_AccountId", query = "select g from GrantAccess g where g.id.accountId = :accountId")
+        @NamedQuery(name = "GrantAccess.findById_AccountId", query = "select g from GrantAccess g where g.id.accountId = :accountId"),
+        @NamedQuery(name = "GrantAccess.updateIdRoleIdAndIdAccountIdAndRoleAndAccountAndIsGrantAndNoteById_RoleIdAndId_AccountId", query = "update GrantAccess g set g.id.roleId = :roleId1, g.id.accountId = :accountId2, g.role = :role, g.account = :account, g.isGrant = :isGrant, g.note = :note where g.id.roleId = :roleId7 and g.id.accountId = :accountId8")
 })
 public class GrantAccess {
     @EmbeddedId

@@ -11,6 +11,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 @WebServlet(name = "ControlServlet", value = "/ControlServlet")
@@ -43,7 +44,34 @@ public class ControllerServlet extends HttpServlet {
                 request.setAttribute("errorMessage", "Invalid username or password");
                 request.getRequestDispatcher("index.jsp").forward(request, response);
             }
-        } else if ("add".equals(action)) {
+        } else if ("assignRoles".equals(action)) {
+            String accountId = request.getParameter("accountId");
+            String[] roles = request.getParameterValues("roles");
+            System.out.println("Roles: " + Arrays.toString(roles));
+
+            if (accountId != null && roles != null) {
+                List<String> roleNames = Arrays.asList(roles);
+
+                // Cập nhật vai trò cho tài khoản
+                Account account = accountServices.findAccountByAccountId(accountId);
+                if (account != null) {
+                    accountServices.updateRoles(accountId, roleNames);
+
+                    // Cập nhật danh sách tài khoản trong session
+                    List<Account> accounts = accountServices.getAllAccounts();
+                    session.setAttribute("accounts", accounts);
+
+                    // Giữ lại người dùng ở dashboard.jsp và hiển thị dữ liệu đã cập nhật
+                    request.getRequestDispatcher("ControlServlet?action=adminDashboard").forward(request, response);
+                } else {
+                    request.setAttribute("errorMessage", "Account not found.");
+                    request.getRequestDispatcher("dashboard.jsp").forward(request, response);
+                }
+            } else {
+                request.setAttribute("errorMessage", "Invalid account or roles data.");
+                request.getRequestDispatcher("dashboard.jsp").forward(request, response);
+            }
+        }else if ("add".equals(action)) {
             request.getRequestDispatcher("addAndEdit.jsp").forward(request, response);
         } else if ("edit".equals(action)) {
             String accountId = request.getParameter("accountId");
@@ -57,7 +85,7 @@ public class ControllerServlet extends HttpServlet {
                 request.setAttribute("errorMessage", "Account not found.");
                 request.getRequestDispatcher("dashboard.jsp").forward(request, response);
             }
-        } else if ("saveAdd".equals(action)) {
+        } if ("saveAdd".equals(action) || "saveEdit".equals(action) || "assignRoles".equals(action)) {
             String accountId = request.getParameter("accountId");
             String fullName = request.getParameter("fullName");
             String password = request.getParameter("password");
@@ -66,50 +94,16 @@ public class ControllerServlet extends HttpServlet {
             String statusStr = request.getParameter("status");
             String[] roles = request.getParameterValues("roles");
 
-            if (accountId == null || fullName == null || password == null || email == null || phone == null || statusStr == null) {
-                request.setAttribute("errorMessage", "All fields are required.");
+            if (accountId == null || fullName == null || password == null || email == null || phone == null || statusStr == null || roles == null || roles.length == 0) {
+                request.setAttribute("errorMessage", "All fields and at least one role are required.");
                 request.getRequestDispatcher("addAndEdit.jsp").forward(request, response);
                 return;
             }
 
             try {
                 byte status = Byte.parseByte(statusStr);
-
-                Account account = new Account();
-                account.setAccountId(accountId);
-                account.setFullName(fullName);
-                account.setPassword(password);
-                account.setEmail(email);
-                account.setPhone(phone);
-                account.setStatus(status);
-
-
-                accountServices.addAccount(account); // Save account to the database
-                session.setAttribute("accounts", accountServices.getAllAccounts());
-                response.sendRedirect("ControlServlet?action=adminDashboard");
-            } catch (NumberFormatException e) {
-                request.setAttribute("errorMessage", "Invalid status value.");
-                request.getRequestDispatcher("addAndEdit.jsp").forward(request, response);
-            }
-        } else if ("saveEdit".equals(action)) {
-            String accountId = request.getParameter("accountId");
-            String fullName = request.getParameter("fullName");
-            String password = request.getParameter("password");
-            String email = request.getParameter("email");
-            String phone = request.getParameter("phone");
-            String statusStr = request.getParameter("status");
-            String[] roles = request.getParameterValues("roles");
-
-            if (accountId == null || fullName == null || password == null || email == null || phone == null || statusStr == null) {
-                request.setAttribute("errorMessage", "All fields are required.");
-                request.getRequestDispatcher("addAndEdit.jsp").forward(request, response);
-                return;
-            }
-
-            try {
-                byte status = Byte.parseByte(statusStr);
-
-                accountServices.updateAccount(accountId, fullName, password, email, phone, status, Arrays.asList(roles));
+                List<String> roleNames = Arrays.asList(roles);
+                accountServices.updateAccount(accountId, fullName, password, email, phone, status, roleNames);
 
                 List<Account> accounts = accountServices.getAllAccounts();
                 session.setAttribute("accounts", accounts);
@@ -126,6 +120,7 @@ public class ControllerServlet extends HttpServlet {
         } else {
             doGet(request, response);
         }
+
     }
 
     @Override

@@ -31,5 +31,8 @@ public class AccountServices {
     public boolean isAdministrator(String accountId, String roleId) {
         return accountRepository.isAdministrator(accountId,roleId);
     }
+    public void updateRoles(String accountId, List<String> roleNames) {
+        accountRepository.updateRoles(accountId, roleNames);
+    }
 }
 
