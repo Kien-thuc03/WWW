@@ -1,7 +1,9 @@
 package edu.iuh.fit.week01_lab_nguyenkienthuc_21038611.controllers;
 
 import edu.iuh.fit.week01_lab_nguyenkienthuc_21038611.entities.Account;
+import edu.iuh.fit.week01_lab_nguyenkienthuc_21038611.entities.Log;
 import edu.iuh.fit.week01_lab_nguyenkienthuc_21038611.services.AccountServices;
+import edu.iuh.fit.week01_lab_nguyenkienthuc_21038611.services.LogServices;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -16,6 +18,7 @@ import java.util.List;
 @WebServlet(name = "ControlServlet", value = "/ControlServlet")
 public class ControllerServlet extends HttpServlet {
     private AccountServices accountServices;
+    private LogServices logServices = new LogServices();
 
     @Override
     public void init() throws ServletException {
@@ -63,6 +66,12 @@ public class ControllerServlet extends HttpServlet {
             session.setAttribute("account", account);
             session.setAttribute("accounts", accountServices.getAllAccounts());
             response.sendRedirect("dashboard.jsp");
+
+            // Log login
+            Long id = logServices.logLogin(account.getAccountId());
+            if (id != null) {
+                session.setAttribute("logId", id);
+            }
         } else {
             request.setAttribute("errorMessage", "Invalid username or password");
             request.getRequestDispatcher("index.jsp").forward(request, response);
@@ -161,12 +170,25 @@ public class ControllerServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         HttpSession session = request.getSession(false);
         String action = request.getParameter("action");
-
         if (action == null) {
             action = "login";
         }
-
-        if (session != null && session.getAttribute("username") != null) {
+        if ("logout".equals(action) && session != null) {
+            Long logId = Long.parseLong(request.getParameter("logId"));
+            Account account = (Account) session.getAttribute("account");
+            String accountId = account.getAccountId();
+            System.out.println("Logging out account: " + logId);
+            if (accountId != null) {
+                try {
+                    System.out.println("Logging out account: " + accountId);
+                    logServices.logLogout(logId);
+                } catch (NumberFormatException e) {
+                    System.err.println("Invalid accountId format: " + e.getMessage());
+                }
+            }
+            session.invalidate();
+            response.sendRedirect("index.jsp");
+        } else if (session != null && session.getAttribute("username") != null) {
             if ("adminDashboard".equals(action)) {
                 List<Account> accounts = accountServices.getAllAccounts();
                 request.setAttribute("accounts", accounts);

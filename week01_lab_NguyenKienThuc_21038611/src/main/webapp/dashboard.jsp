@@ -125,6 +125,7 @@
         .role-form {
             display: flex;
             flex-direction: column;
+            align-items: center;
         }
         .role-form label {
             margin-bottom: 5px;
@@ -133,6 +134,7 @@
             margin-right: 10px;
         }
         .role-form button {
+            width: fit-content;
             margin-top: 10px;
             padding: 10px;
             background-color: #4CAF50;
@@ -152,6 +154,8 @@
     <h1>BÀI TẬP THỰC HÀNH TUẦN 1</h1>
         <%
         Account userAccount = (Account) session.getAttribute("account");
+        Long logId = (Long) session.getAttribute("logId");
+        String accountId = request.getParameter("accountId");
         if (userAccount != null) {
             boolean isAdmin = userAccount.getRoleNames().contains("administrator");
     %>
@@ -164,9 +168,13 @@
         <p><span>Roles:</span> <%= String.join(", ", userAccount.getRoleNames()) %></p>
     </div>
     <div class="actions">
-        <button onclick="window.location.href='index.jsp'">Log out</button>
+        <form action="ControlServlet" method="post" class="form-inline">
+            <input type="hidden" name="action" value="logout">
+            <input type="hidden" name="logId" value="<%= logId %>">
+            <button type="submit">Log out</button>
+        </form>
     </div>
-        <%
+    <%
         if (isAdmin) {
     %>
     <h2>Account Management</h2>
@@ -210,7 +218,7 @@
         } else {
         %>
         <tr>
-            <td colspan="7">No accounts found.</td> <!-- Adjust colspan to 7 -->
+            <td colspan="7">No accounts found.</td>
         </tr>
         <%
             }
@@ -232,7 +240,6 @@
         <div class="role-filter">
             <label><input type="checkbox" name="role" value="administrator" onclick="filterRoles()"> Administrator</label>
             <label><input type="checkbox" name="role" value="user" onclick="filterRoles()"> User</label>
-            <!-- Add more roles as needed -->
         </div>
         <form action="ControlServlet" method="post" class="role-form">
             <input type="hidden" name="action" value="assignRoles">

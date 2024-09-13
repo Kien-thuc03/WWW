@@ -11,7 +11,10 @@ import java.time.Instant;
 @NamedQueries({
         @NamedQuery(name = "Log.findById", query = "select l from Log l where l.id = :id"),
         @NamedQuery(name = "Log.deleteById", query = "delete from Log l where l.id = :id"),
-        @NamedQuery(name = "Log.updateAccountIdAndLoginTimeAndLogoutTimeAndNotesById", query = "update Log l set l.accountId = :accountId, l.loginTime = :loginTime, l.logoutTime = :logoutTime, l.notes = :notes where l.id = :id")
+        @NamedQuery(name = "Log.updateLogoutTimeByAccountId", query = "update Log l set l.logoutTime = :logoutTime where l.accountId = :accountId"),
+        @NamedQuery(name = "Log.countById", query = "select count(l) from Log l where l.id = :id"),
+        @NamedQuery(name = "Log.updateLogoutTimeByIdAndAccountId", query = "update Log l set l.logoutTime = :logoutTime where l.id = :id and l.accountId = :accountId"),
+        @NamedQuery(name = "Log.count", query = "select count(l) from Log l")
 })
 public class Log {
     @Id
