@@ -51,7 +51,7 @@
             text-align: left;
         }
         th {
-            background-color: #4CAF50;
+            background-color: #1c9362;
             color: white;
         }
         tr:nth-child(even) {
@@ -127,8 +127,6 @@
             flex-direction: column;
         }
         .role-form label {
-            display: flex;
-            align-items: center;
             margin-bottom: 5px;
         }
         .role-form input[type="checkbox"] {
@@ -218,50 +216,60 @@
             }
         %>
     </table>
+    <div class="actions">
+        <form action="ControlServlet" method="post" class="form-inline">
+            <input type="hidden" name="action" value="add">
+            <button type="submit">Add Account</button>
+        </form>
+    </div>
     <div class="roles-section">
-        <h2>Các quyền của các account</h2>
+        <h2>Assign Roles</h2>
+        <% if (request.getAttribute("errorMessage") != null) { %>
+        <div style="color: red; font-weight: bold; margin-bottom: 20px;">
+            <%= request.getAttribute("errorMessage") %>
+        </div>
+        <% } %>
         <div class="role-filter">
             <label><input type="checkbox" name="role" value="administrator" onclick="filterRoles()"> Administrator</label>
             <label><input type="checkbox" name="role" value="user" onclick="filterRoles()"> User</label>
             <!-- Add more roles as needed -->
         </div>
-        <table>
-            <tr>
-                <th>Account ID</th>
-                <th>Full Name</th>
-                <th>Roles</th>
-                <th>Assign Roles</th>
-            </tr>
-            <%
-                if (accounts != null) {
-                    for (Account account : accounts) {
-            %>
-            <tr class="role-row" data-roles="<%= String.join(" ", account.getRoleNames()) %>">
-                <td><%= account.getAccountId() %></td>
-                <td><%= account.getFullName() %></td>
-                <td><%= String.join(", ", account.getRoleNames()) %></td>
-                <td>
-                    <form action="ControlServlet" method="post">
-                        <input type="hidden" name="accountId" value="<%= account.getAccountId() %>">
-                        <input type="hidden" name="action" value="assignRoles">
-                        <label><input type="checkbox" name="roles" value="administrator" <%= account.getRoleNames().contains("administrator") ? "checked" : "" %>> Administrator</label>
-                        <label><input type="checkbox" name="roles" value="user" <%= account.getRoleNames().contains("user") ? "checked" : "" %>> User</label>
-                        <!-- Add more roles as needed -->
-                        <button type="submit">Assign</button>
-                    </form>
-                </td>
-            </tr>
-            <%
-                }
-            } else {
-            %>
-            <tr>
-                <td colspan="4">No accounts found.</td>
-            </tr>
-            <%
-                }
-            %>
-        </table>
+        <form action="ControlServlet" method="post" class="role-form">
+            <input type="hidden" name="action" value="assignRoles">
+            <table>
+                <tr>
+                    <th>Account ID</th>
+                    <th>Full Name</th>
+                    <th>Roles</th>
+                    <th>Assign Roles</th>
+                </tr>
+                <% if (accounts != null) {
+                    for (Account account : accounts) { %>
+                <tr class="role-row" data-roles="<%= String.join(" ", account.getRoleNames()) %>">
+                    <td><%= account.getAccountId() %></td>
+                    <td><%= account.getFullName() %></td>
+                    <td><%= String.join(", ", account.getRoleNames()) %></td>
+                    <td>
+                        <input type="hidden" name="accountId_<%= account.getAccountId() %>" value="<%= account.getAccountId() %>">
+                        <label>
+                            <input type="checkbox" name="roles_<%= account.getAccountId() %>" value="administrator"
+                                <%= account.getRoleNames().contains("administrator") ? "checked" : "" %>> Administrator
+                        </label>
+                        <label>
+                            <input type="checkbox" name="roles_<%= account.getAccountId() %>" value="user"
+                                <%= account.getRoleNames().contains("user") ? "checked" : "" %>> User
+                        </label>
+                    </td>
+                </tr>
+                <% }
+                } else { %>
+                <tr>
+                    <td colspan="4">No accounts found.</td>
+                </tr>
+                <% } %>
+            </table>
+            <button type="submit">Apply Changes</button>
+        </form>
     </div>
     <%
         }
