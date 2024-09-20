@@ -42,15 +42,26 @@ public class EmployeeResources {
     @Produces("application/json")
     @Consumes("application/json")
     public Response insert(Employee employee) {
-        employeeServices.insertEmp(employee);
+        employeeServices.insertEmployee(employee);
         return Response.ok(employee).build();
     }
 
     @DELETE
     @Path("/{id}")
     public Response delete(@PathParam("id") long id) {
-        if (employeeServices.delete(id))
+        if (employeeServices.deleteEmployee(id))
             return Response.ok().build();
         return Response.status(Response.Status.NOT_FOUND).build();
     }
+
+    @POST
+    @Path("/{id}")
+    @Consumes("application/json")
+    public Response update(@PathParam("id") long id, Employee employee) {
+        employee.setId(id);
+        if (employeeServices.updateEmployee(employee))
+            return Response.ok(employee).build();
+        return Response.status(Response.Status.NOT_FOUND).build();
+    }
+
 }

@@ -11,48 +11,61 @@ import java.util.List;
 import java.util.Optional;
 
 public class EmployeeServices {
-    private EmployeeRepository repository;
+    private final EmployeeRepository repository;
 
     public EmployeeServices() {
         repository = new EmployeeRepository();
     }
 
-    public void insertEmp(Employee employee) {
+    public boolean updateStatus(long id) {
+        Optional<Employee> op = findById(id);
+        if (op.isPresent()) {
+            Employee employee = op.get();
+            repository.setStatus(employee, EmployeeStatus.ACTIVE);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean restEmployee(long id) {
+        Optional<Employee> op = findById(id);
+        if (op.isPresent()) {
+            Employee employee = op.get();
+            repository.setStatus(employee, EmployeeStatus.IN_ACTIVE);
+            return true;
+        }
+        return false;
+    }
+    public List<Employee> getAll() {
+        return repository.getAllEmp();
+    }
+    public void insertEmployee(Employee employee) {
         repository.insertEmp(employee);
     }
 
+    public boolean updateEmployee(Employee employee) {
+        return repository.update(employee);
+    }
 
+    public boolean deleteEmployee(long id) {
+        Optional<Employee> op = findById(id);
+        if (op.isPresent()) {
+            Employee employee = op.get();
+            repository.setStatus(employee, EmployeeStatus.TERMINATED);
+            return true;
+        }
+        return false;
+    }
     public Optional<Employee> findById(long id) {
         return repository.findbyId(id);
     }
 
-    public boolean delete(long id) {
-        Optional<Employee> op = findById(id);
-        if (op.isPresent()) {
-            Employee employee = op.get();
-            employee.setStatus(EmployeeStatus.TERMINATED);
-            return true;
-        }
-        return false;
+    public void updateStatus(Long id, EmployeeStatus status) {
+        repository.updateStatus(id, status);
     }
 
-    public boolean activeEmp(long id) {
-        Optional<Employee> op = findById(id);
-        if (op.isPresent()) {
-            Employee employee = op.get();
-            employee.setStatus(EmployeeStatus.ACTIVE);
-            return true;
-        }
-        return false;
-    }
-
-    public List<Employee> getAll() {
-        return repository.getAllEmp();
-    }
-
-    public List<Order> getOrdersByPeriod(long empId, Date from, Date to) {
-        //......
-        return null;
+    public Employee getEmployeeById(long id) {
+        return repository.getEmployeeById(id);
     }
 }
 

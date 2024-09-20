@@ -6,8 +6,12 @@ import java.time.LocalDate;
 
 @Entity
 @Table(name = "orders")
+@NamedQueries({
+        @NamedQuery(name = "Order.findByOrderDate", query = "select o from Order o where o.orderDate = :orderDate")
+})
 public class Order {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "order_id", nullable = false)
     private Long id;
 

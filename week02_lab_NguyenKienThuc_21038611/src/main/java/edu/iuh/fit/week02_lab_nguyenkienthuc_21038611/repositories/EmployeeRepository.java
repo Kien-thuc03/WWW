@@ -28,27 +28,52 @@ public class EmployeeRepository {
 
     public void insertEmp(Employee employee) {
         try {
-            trans.begin();
+            em.getTransaction().begin();
             em.persist(employee);
-            trans.commit();
-        } catch (Exception ex) {
-            trans.rollback();
-            logger.error(ex.getMessage());
+            em.getTransaction().commit();
+        } catch (Exception e) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            logger.error("Error inserting employee: " + e.getMessage());
+            throw e;
+        } finally {
+            if (em.isOpen()) {
+                em.close();
+            }
         }
     }
+
 
     public void setStatus(Employee employee, EmployeeStatus status) {
         employee.setStatus(status);
     }
 
-    public void update(Employee employee) {
+    public boolean update(Employee employee) {
         try {
             trans.begin();
             em.merge(employee);
             trans.commit();
-        } catch (Exception ex) {
+            return true;
+        } catch (Exception e) {
+            logger.error(e.getMessage());
             trans.rollback();
-            logger.error(ex.getMessage());
+            return false;
+        }
+    }
+
+    public void updateStatus(Long id, EmployeeStatus status) {
+        TypedQuery<Employee> query = em.createNamedQuery("Employee.findById", Employee.class)
+                .setParameter("id", id);
+        Employee employee = query.getSingleResult();
+        employee.setStatus(status);
+        try {
+            trans.begin();
+            em.merge(employee);
+            trans.commit();
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            trans.rollback();
         }
     }
 
@@ -59,7 +84,15 @@ public class EmployeeRepository {
         return emp == null ? Optional.empty() : Optional.of(emp);
     }
 
+    public Employee getEmployeeById(long id) {
+        return em.find(Employee.class, id);
+    }
+
     public List<Employee> getAllEmp() {
+        return em.createNamedQuery("Employee.findAll", Employee.class)
+                .getResultList();
+    }
+    public List<Employee> getAllEmpByStatus() {
         return em.createNamedQuery("Employee.findByStatus", Employee.class)
                 .setParameter("status", EmployeeStatus.ACTIVE)
                 .getResultList();
