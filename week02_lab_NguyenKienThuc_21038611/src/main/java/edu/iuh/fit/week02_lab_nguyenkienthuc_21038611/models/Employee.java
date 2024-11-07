@@ -7,11 +7,11 @@ import jakarta.validation.constraints.Size;
 import java.time.LocalDate;
 
 @Entity
-@Table(name = "employee")
+@Table(name = "employees")
 @NamedQueries({
-        @NamedQuery(name = "Employee.findAll", query = "select e from Employee e"),
-        @NamedQuery(name = "Employee.findByStatus", query = "select e from Employee e where e.status = :status"),
-        @NamedQuery(name = "Employee.findById", query = "select e from Employee e where e.id = :id")
+        @NamedQuery(name = "Employees.findAll", query = "select e from Employee e"),
+        @NamedQuery(name = "Employees.findByStatus", query = "select e from Employee e where e.status = :status"),
+        @NamedQuery(name = "Employees.findById", query = "select e from Employee e where e.id = :id")
 })
 public class Employee {
     @Id

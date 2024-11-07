@@ -16,7 +16,7 @@ public class OrderRepository {
     private EntityTransaction trans;
 
     public OrderRepository() {
-        em = Persistence.createEntityManagerFactory("lab_week_2").createEntityManager();
+        em = Persistence.createEntityManagerFactory("th05").createEntityManager();
         trans = em.getTransaction();
     }
 

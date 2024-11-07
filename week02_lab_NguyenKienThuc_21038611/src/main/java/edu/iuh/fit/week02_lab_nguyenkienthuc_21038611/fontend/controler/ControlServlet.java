@@ -1,4 +1,4 @@
-package edu.iuh.fit.week02_lab_nguyenkienthuc_21038611.controler;
+package edu.iuh.fit.week02_lab_nguyenkienthuc_21038611.fontend.controler;
 
 import edu.iuh.fit.week02_lab_nguyenkienthuc_21038611.enums.EmployeeStatus;
 import edu.iuh.fit.week02_lab_nguyenkienthuc_21038611.models.Employee;

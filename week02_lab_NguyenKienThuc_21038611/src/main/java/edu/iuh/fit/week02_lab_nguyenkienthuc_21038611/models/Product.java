@@ -6,6 +6,13 @@ import jakarta.validation.constraints.Size;
 
 @Entity
 @Table(name = "product")
+@NamedQueries({
+        @NamedQuery(name = "Product.findAll", query = "select p from Product p"),
+        @NamedQuery(name = "Product.findById", query = "select p from Product p where p.id = :id"),
+        @NamedQuery(name = "Product.findByStatus", query = "select p from Product p where p.status = :status"),
+        @NamedQuery(name = "Product.deleteById", query = "delete from Product p where p.id = :id"),
+        @NamedQuery(name = "Product.updateNameAndDescriptionAndUnitAndManufacturerNameAndStatusById", query = "update Product p set p.name = :name, p.description = :description, p.unit = :unit, p.manufacturerName = :manufacturerName, p.status = :status where p.id = :id")
+})
 public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

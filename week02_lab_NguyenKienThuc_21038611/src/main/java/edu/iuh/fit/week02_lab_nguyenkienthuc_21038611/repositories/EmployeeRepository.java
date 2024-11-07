@@ -21,7 +21,7 @@ public class EmployeeRepository {
 
     public EmployeeRepository() {
         em = Persistence
-                .createEntityManagerFactory("lab_week_2")
+                .createEntityManagerFactory("th05")
                 .createEntityManager();
         trans = em.getTransaction();
     }
@@ -63,7 +63,7 @@ public class EmployeeRepository {
     }
 
     public void updateStatus(Long id, EmployeeStatus status) {
-        TypedQuery<Employee> query = em.createNamedQuery("Employee.findById", Employee.class)
+        TypedQuery<Employee> query = em.createNamedQuery("Employees.findById", Employee.class)
                 .setParameter("id", id);
         Employee employee = query.getSingleResult();
         employee.setStatus(status);
@@ -89,11 +89,11 @@ public class EmployeeRepository {
     }
 
     public List<Employee> getAllEmp() {
-        return em.createNamedQuery("Employee.findAll", Employee.class)
+        return em.createNamedQuery("Employees.findAll", Employee.class)
                 .getResultList();
     }
     public List<Employee> getAllEmpByStatus() {
-        return em.createNamedQuery("Employee.findByStatus", Employee.class)
+        return em.createNamedQuery("Employees.findByStatus", Employee.class)
                 .setParameter("status", EmployeeStatus.ACTIVE)
                 .getResultList();
     }
