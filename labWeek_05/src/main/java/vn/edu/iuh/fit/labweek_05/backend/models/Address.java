@@ -26,7 +26,7 @@ public class Address {
     private String city;
 
     @Column(name = "country")
-    private Short country;
+    private CountryCode country;
 
     @Column(name = "number", length = 20)
     private String number;
@@ -40,6 +40,4 @@ public class Address {
     @OneToOne(mappedBy = "address")
     private Company company;
 
-    public Address(String s, String quangTrung, String hcm, String s1, CountryCode countryCode) {
-    }
 }

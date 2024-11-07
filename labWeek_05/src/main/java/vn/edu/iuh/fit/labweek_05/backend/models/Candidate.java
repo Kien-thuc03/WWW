@@ -41,6 +41,4 @@ public class Candidate {
     @OneToMany(mappedBy = "candidate")
     private Set<CandidateSkill> candidateSkills = new LinkedHashSet<>();
 
-    public Candidate(String s, LocalDate of, Address add, String s1, String s2) {
-    }
 }

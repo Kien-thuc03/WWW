@@ -36,23 +36,25 @@
     </div>
     <div class="mb-3">
       <label for="street" class="form-label">Street</label>
-      <input type="text" class="form-control" id="street" name="street" required>
+      <input type="text" class="form-control" id="street" name="address.street" required>
     </div>
     <div class="mb-3">
       <label for="city" class="form-label">City</label>
-      <input type="text" class="form-control" id="city" name="city" required>
+      <input type="text" class="form-control" id="city" name="address.city" required>
     </div>
     <div class="mb-3">
       <label for="country" class="form-label">Country</label>
-      <input type="text" class="form-control" id="country" name="country" required>
+      <select type="text" class="form-control" id="country" name="address.country" required>
+        <option th:each="country : ${countries}" th:text="${country}"></option>
+        </select>
     </div>
     <div class="mb-3">
       <label for="number" class="form-label">Number</label>
-      <input type="text" class="form-control" id="number" name="number" required>
+      <input type="text" class="form-control" id="number" name="address.number" required>
     </div>
     <div class="mb-3">
       <label for="zipcode" class="form-label">Zipcode</label>
-      <input type="text" class="form-control" id="zipcode" name="zipcode" required>
+      <input type="text" class="form-control" id="zipcode" name="address.zipcode" required>
     </div>
     <button type="submit" class="btn btn-primary">Add Candidate</button>
   </form>

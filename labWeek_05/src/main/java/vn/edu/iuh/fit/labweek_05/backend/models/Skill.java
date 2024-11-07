@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import vn.edu.iuh.fit.labweek_05.backend.enums.SkillLevel;
+import vn.edu.iuh.fit.labweek_05.backend.enums.SkillType;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -26,7 +27,7 @@ public class Skill {
 
     @Column(name = "type")
     @Enumerated(EnumType.ORDINAL)
-    private SkillLevel type;
+    private SkillType type;
 
     @OneToMany(mappedBy = "skill")
     private Set<CandidateSkill> candidateSkills = new LinkedHashSet<>();
