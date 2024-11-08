@@ -17,12 +17,14 @@
         </div>
         <div class="mb-3">
             <label for="subject" class="form-label">Subject</label>
-            <input type="email" class="form-control" id="subject" name="subject" th:vale="${job.company.email}" >
+            <input type="text" class="form-control" id="subject" name="subject" required>
         </div>
         <div class="mb-3">
             <label for="body" class="form-label">Body</label>
-            <textarea class="form-control" id="body" name="body" rows="5" required></textarea>
+            <textarea class="form-control" id="body" name="emailBody" rows="5" required></textarea>
         </div>
+        <input type="hidden" name="jobId" th:value="${job.id}">
+        <input type="hidden" name="candidateId" th:value="${candidate.id}">
         <button type="submit" class="btn btn-primary">Send</button>
     </form>
 </div>

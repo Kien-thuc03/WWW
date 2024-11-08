@@ -14,10 +14,13 @@ public class CandidateServices {
     @Autowired
     private CandidateRepository candidateRepository;
 
-    public Page<Candidate> findAll(int pageNo, int pageSize, String sortBy, String sortDirection) {
+    public Page<Candidate> findAll(int pageNo, int pageSize,String keyword, String sortBy, String sortDirection) {
         Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), sortBy);
         Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
-        return candidateRepository.findAll(pageable);
+        if (keyword == null || keyword.isEmpty()) {
+            return candidateRepository.findAll(pageable);
+        }
+        return candidateRepository.findByFullNameContainingIgnoreCase("%" + keyword + "%", pageable);
     }
 
     public List<Candidate> findAll() {

@@ -26,14 +26,17 @@ public class CompanyController {
     @RequestMapping(value = "/companies")
     public String showCompanyListPaging(Model model,
                                           @RequestParam("page") Optional<Integer> page,
-                                          @RequestParam("size") Optional<Integer> size) {
+                                          @RequestParam("size") Optional<Integer> size,
+                                        @RequestParam("keyword") Optional<String> keyword) {
         int currentPage = page.orElse(1);
         int pageSize = size.orElse(10);
+        String searchKeyword  = keyword.orElse("");
         Page<Company> companyPage= companyServices.findAll(
-                currentPage - 1,pageSize,"id","asc");
+                currentPage - 1,pageSize,searchKeyword,"id","asc");
 
 
         model.addAttribute("companyPage", companyPage);
+        model.addAttribute("search", searchKeyword);
 
         int totalPages = companyPage.getTotalPages();
         if (totalPages > 0) {

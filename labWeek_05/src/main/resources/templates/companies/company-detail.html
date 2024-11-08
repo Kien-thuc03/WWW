@@ -14,10 +14,17 @@
     </style>
 </head>
 <body>
-<div class="container mt-4">
-    <nav class="navbar navbar-expand-lg navbar-light bg-light mb-4 ">
-        <div class="container-fluid">
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0 ">
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">Lab Week 5</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="/index.html">Home</a>
+                </li>
                 <li class="nav-item">
                     <a class="nav-link" href="/jobs">Jobs</a>
                 </li>
@@ -27,9 +34,14 @@
                 <li class="nav-item">
                     <a class="nav-link" href="/companies">Companies</a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/list">Candidates no paging</a>
             </ul>
         </div>
-    </nav>
+    </div>
+</nav>
+<div class="container mt-4">
+
     <div class="card mb-4">
         <div class="card-body" th:object="${company}">
             <h1 class="card-title text-center">Company Information</h1>
@@ -38,6 +50,7 @@
             <p class="card-text"><b>Phone: </b><span th:text="*{phone}"></span></p>
             <p class="card-text"><b>Address: </b><span th:text="*{address.street}"></span>, <span th:text="*{address.city}"></span>, <span th:text="*{address.country.name}"></span></p>
         </div>
+        <a th:href="@{/jobs/{id}/add-job(id=${company.id})}" class="btn btn-primary ">Add Job</a>
     </div>
     <div class="card">
         <div class="card-body">
@@ -49,8 +62,8 @@
                         <th>Name</th>
                         <th>Description</th>
                         <th>Skills</th>
-                        <th>Suggested Candidates</th>
-                        <th>Apply</th>
+                        <th>For Company</th>
+                        <th>For Candidate</th>
                     </tr>
                 </thead>
                 <tbody>

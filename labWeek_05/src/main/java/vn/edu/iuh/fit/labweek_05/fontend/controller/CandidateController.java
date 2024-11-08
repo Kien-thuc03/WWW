@@ -1,25 +1,19 @@
 package vn.edu.iuh.fit.labweek_05.fontend.controller;
 
-import ch.qos.logback.core.net.SyslogOutputStream;
 import com.neovisionaries.i18n.CountryCode;
-import jakarta.websocket.server.PathParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import vn.edu.iuh.fit.labweek_05.backend.enums.SkillLevel;
-import vn.edu.iuh.fit.labweek_05.backend.models.Candidate;
-import vn.edu.iuh.fit.labweek_05.backend.models.Job;
-import vn.edu.iuh.fit.labweek_05.backend.models.JobSkill;
-import vn.edu.iuh.fit.labweek_05.backend.repositories.CandidateRepository;
-import vn.edu.iuh.fit.labweek_05.backend.repositories.JobRepository;
+import vn.edu.iuh.fit.labweek_05.backend.models.*;
 import vn.edu.iuh.fit.labweek_05.backend.services.AddressServices;
 import vn.edu.iuh.fit.labweek_05.backend.services.CandidateServices;
 import vn.edu.iuh.fit.labweek_05.backend.services.JobServices;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -41,14 +35,17 @@ public class CandidateController {
     @RequestMapping(value = "/candidates")
     public String showCandidateListPaging(Model model,
                                           @RequestParam("page") Optional<Integer> page,
-                                          @RequestParam("size") Optional<Integer> size) {
+                                          @RequestParam("size") Optional<Integer> size,
+                                          @RequestParam("keyword") Optional<String> keyword) {
         int currentPage = page.orElse(1);
         int pageSize = size.orElse(10);
+        String searchKeyword  = keyword.orElse("");
         Page<Candidate> candidatePage = candidateServices.findAll(
-                currentPage - 1, pageSize, "id", "asc");
+                currentPage - 1, pageSize,searchKeyword  , "id", "asc");
 
 
         model.addAttribute("candidatePage", candidatePage);
+        model.addAttribute("search", searchKeyword);
 
         int totalPages = candidatePage.getTotalPages();
         if (totalPages > 0) {
@@ -59,6 +56,8 @@ public class CandidateController {
         }
         return "candidates/candidates-paging";
     }
+
+
 
     @RequestMapping(value = "/add-candidate", method = RequestMethod.GET)
     public String add(Model model) {
@@ -111,16 +110,18 @@ public class CandidateController {
         return "candidates/suggested-skills";
     }
 
-//    @GetMapping("/candidates/{id}/suggested-jobs")
-//    public String suggestJobs(@PathVariable Long id, Model model) {
-//        Candidate candidate = candidateServices.findById(id);
-//        List<Job> allJobs = JobServices.findAllJob();
-//        List<Job> suggestedJobs = allJobs.stream()
-//                .filter(job -> job.getJobSkills().containsAll(candidate.getCandidateSkills()))
-//                .collect(Collectors.toList());
-//        model.addAttribute("suggestedJobs", suggestedJobs);
-//        return "candidates/suggested-jobs";
-//    }
+    @GetMapping("/candidates/{id}/suggested-jobs")
+    public String suggestJobs(@PathVariable Long id, Model model) {
+        Candidate candidate = candidateServices.findById(id);
+        List<Job> suggestedJobs = JobServices.suggestJobsForCandidate(id);
+
+        model.addAttribute("candidate", candidate);
+        model.addAttribute("suggestedJobs", suggestedJobs);
+
+        return "jobs/suggested-jobs";
+    }
+
+
 
     @GetMapping("/jobs/{id}/suggested-candidates")
     public String suggestCandidates(@PathVariable Long id, Model model) {
@@ -132,6 +133,6 @@ public class CandidateController {
                 .toList();
         model.addAttribute("suggestedCandidates", list);
         model.addAttribute("job", job);
-        return "candidates/candidates-suggested";
+        return "companies/candidates-suggested";
     }
 }

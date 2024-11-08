@@ -2,21 +2,86 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>New Job</title>
+    <title>Add New Job</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 <body>
-<!--    <form action="/jobs" method="post">-->
-<!--        <label for="jobName">Job Name:</label>-->
-<!--        <input type="text" id="jobName" name="jobName" required>-->
-<!--        <label for="jobDesc">Job Description:</label>-->
-<!--        <textarea id="jobDesc" name="jobDesc" required></textarea>-->
-<!--        <label for="requiredSkills">Required Skills (comma separated):</label>-->
-<!--        <input type="text" id="requiredSkills" name="requiredSkills" required>-->
-<!--        <lable for="company">Company:</lable>-->
-<!--        <input type="text" id="company" name="company" required>-->
-<!--        <button type="submit">Create Job</button>-->
-<!--    </form>-->
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">Lab Week 5</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="/index.html">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/jobs">Jobs</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/candidates">Candidates</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/companies">Companies</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
 
-<h1> COMING SOON</h1>
+<!-- Thông tin về công ty -->
+<div class="card mb-4">
+    <div class="card-body" th:object="${company}">
+        <h1 class="card-title">Company Information</h1>
+        <p class="card-text"><b>Company name: </b><span th:text="*{compName}"></span></p>
+        <p class="card-text"><b>Email: </b><span th:text="*{email}"></span></p>
+        <p class="card-text"><b>Phone: </b><span th:text="*{phone}"></span></p>
+        <p class="card-text"><b>Address: </b><span th:text="*{address.street}"></span>, <span th:text="*{address.city}"></span>, <span th:text="*{address.country.name}"></span></p>
+    </div>
+</div>
+
+<!-- Form thêm mới công việc -->
+<div class="container mt-5">
+    <div class="container mt-5">
+        <h1 class="text-center">Add New Job</h1>
+        <form th:action="@{/jobs/{id}/add-job(id=${company.id})}" method="post">
+            <div class="mb-3">
+                <label for="jobName" class="form-label">Job Name</label>
+                <input type="text" class="form-control" id="jobName" name="jobName" required>
+            </div>
+            <div class="mb-3">
+                <label for="jobDesc" class="form-label">Job Description</label>
+                <textarea class="form-control" id="jobDesc" name="jobDesc" rows="3" required></textarea>
+            </div>
+
+            <div id="skillContainer">
+                <div class="row mb-4" th:each="i : ${#numbers.sequence(0, 4)}">
+                    <div class="col">
+                        <label class="form-label">Job Skills</label>
+                        <select class="form-select" th:field="*{jobSkills[__${i}__].skill.id}" required>
+                            <option th:each="skill : ${skills}" th:value="${skill.id}" th:text="${skill.skillName}"></option>
+                        </select>
+                    </div>
+                    <div class="col">
+                        <label class="form-label">Skill Level</label>
+                        <select class="form-select" th:field="*{jobSkills[__${i}__].skillLevel}" required>
+                            <option th:each="level : ${skillLevels}" th:value="${level}" th:text="${level}"></option>
+                        </select>
+                    </div>
+                    <div class="col">
+                        <label class="form-label">More Info</label>
+                        <input type="text" class="form-control" th:field="*{jobSkills[__${i}__].moreInfos}" required>
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Add Job</button>
+        </form>
+    </div>
+</div>
 </body>
 </html>

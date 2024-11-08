@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Suggested Jobs</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">Lab Week 5</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="/index.html">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/jobs">Jobs</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/candidates">Candidates</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/companies">Companies</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+<div class="container mt-5">
+    <h1 class="text-center">Suggested Jobs for <span th:text="${candidate.fullName}"></span></h1>
+    <div class="mb-3">
+        <h4>Candidate Information</h4>
+        <p><strong>Name:</strong> <span th:text="${candidate.fullName}"></span></p>
+        <p><strong>Email:</strong> <span th:text="${candidate.email}"></span></p>
+        <p><strong>Phone:</strong> <span th:text="${candidate.phone}"></span></p>
+        <p><strong>Address:</strong> <span th:text="${candidate.address.street + ', ' + candidate.address.city + ', ' + candidate.address.country}"></span></p>
+    </div>
+    <table class="table table-hover table-bordered">
+        <thead class="table-dark">
+        <tr>
+            <th>Job ID</th>
+            <th>Job Name</th>
+            <th>Job Description</th>
+            <th>Company</th>
+            <th>Required Skills</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="job : ${suggestedJobs}">
+            <td th:text="${job.id}"></td>
+            <td th:text="${job.jobName}"></td>
+            <td th:text="${job.jobDesc}"></td>
+            <td th:text="${job.company.compName}"></td>
+            <td>
+                <ul>
+                    <li th:each="jobSkill : ${job.jobSkills}">
+                        <span th:text="${jobSkill.skill.skillName}"></span>:
+                        <span th:text="${jobSkill.skillLevel}"></span> -
+                        <span th:text="${jobSkill.skill.type}"></span>
+                    </li>
+                </ul>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

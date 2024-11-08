@@ -21,24 +21,41 @@
     </style>
 </head>
 <body>
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">Lab Week 5</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="/index.html">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/jobs">Jobs</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/candidates">Candidates</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/companies">Companies</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/list">Candidates no paging</a>
+            </ul>
+        </div>
+    </div>
+</nav>
 <div class="container mt-5">
     <h1 class="text-center">List of Companies</h1>
-    <nav class="navbar">
-        <ul class="nav">
-            <li class="nav-item">
-                <a class="nav-link" href="/jobs">Jobs</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="/candidates">Candidate</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="/companies">Company</a>
-            </li>
-        </ul>
-    </nav>
     <div class="mb-3 text-end">
         <a href="/add-company" class="btn btn-primary">Add Company</a>
     </div>
+    <form class="d-flex mb-3" method="get" action="/companies">
+        <input class="form-control me-2" type="search" name="keyword" placeholder="Search by Name, Email, Phone,..." aria-label="Search" th:value="${search}">
+        <button class="btn btn-outline-success" type="submit">Search</button>
+    </form>
     <table class="table table-hover table-bordered">
         <thead class="table-dark">
         <tr>
@@ -70,7 +87,7 @@
         <nav>
             <ul class="pagination flex-wrap">
                 <li class="page-item" th:each="pageNumber : ${pageNumbers}">
-                    <a class="page-link" th:href="@{/companies(size=${companyPage.size}, page=${pageNumber})}"
+                    <a class="page-link" th:href="@{/companies(size=${companyPage.size}, page=${pageNumber},keyword=${search})}"
                        th:text="${pageNumber}"
                        th:classappend="${pageNumber == companyPage.number + 1} ? 'active' : ''"></a>
                 </li>

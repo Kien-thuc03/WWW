@@ -19,14 +19,17 @@ public class CompanyServices {
     @Autowired
     private CompanyRepository companyRepository;
 
-    public List<Company> findAllJob() {
+    public List<Company> findAll() {
         return (List<Company>) companyRepository.findAll();
     }
 
-    public Page<Company> findAll(int pageNo, int pageSize, String sortBy, String sortDirection) {
+    public Page<Company> findAll(int pageNo, int pageSize,String keyword, String sortBy, String sortDirection) {
         Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), sortBy);
         Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
-        return companyRepository.findAll(pageable);
+        if (keyword == null || keyword.isEmpty()) {
+            return companyRepository.findAll(pageable);
+        }
+        return companyRepository.findByFullNameContainingIgnoreCase("%" + keyword + "%", pageable);
     }
 
     public Company save(Company comp) {
