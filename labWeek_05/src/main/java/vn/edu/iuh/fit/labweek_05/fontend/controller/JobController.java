@@ -4,9 +4,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import vn.edu.iuh.fit.labweek_05.backend.enums.SkillLevel;
 import vn.edu.iuh.fit.labweek_05.backend.enums.SkillType;
+import vn.edu.iuh.fit.labweek_05.backend.ids.JobSkillId;
 import vn.edu.iuh.fit.labweek_05.backend.models.Candidate;
 import vn.edu.iuh.fit.labweek_05.backend.models.Company;
 import vn.edu.iuh.fit.labweek_05.backend.models.Job;
@@ -15,6 +18,7 @@ import vn.edu.iuh.fit.labweek_05.backend.repositories.JobRepository;
 import vn.edu.iuh.fit.labweek_05.backend.repositories.JobSkillRepository;
 import vn.edu.iuh.fit.labweek_05.backend.services.*;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -60,11 +64,8 @@ public class JobController {
     }
 
     @GetMapping("/jobs/{id}/add-job")
-    public String newJobForm(@PathVariable("id") Long companyID,Model model) {
+    public String newJobForm(@PathVariable("id") Long companyID, Model model) {
         Company company = companyServices.findById(companyID);
-        List<JobSkill> jobSkills = jobSkillServices.findAll();
-        List<SkillLevel> skillLevels = List.of(SkillLevel.values());
-        List<SkillType> skillTypes = List.of(SkillType.values());
         model.addAttribute("company", company);
         model.addAttribute("job", new Job());
         model.addAttribute("skills", skillService.findAll());
@@ -73,12 +74,44 @@ public class JobController {
     }
 
     @PostMapping("/jobs/{id}/add-job")
-    public String createJob(@PathVariable("id") Long companyID, @ModelAttribute Job job, @RequestParam("jobSkills") List<Long> jobSkillIds) {
-        Company company = companyServices.findById(companyID);
+    public String createJob(@PathVariable("id") Long companyId,
+                            @RequestParam("jobName") String jobName,
+                            @RequestParam("jobDesc") String jobDesc,
+                            @RequestParam("skills") List<Long> skills,
+                            @RequestParam("skillLevels") List<String> skillLevels,
+                            @RequestParam("more_infos") List<String> moreInfos) {
+        // Khởi tạo và lưu thông tin công việc
+        Job job = new Job();
+        job.setJobName(jobName);
+        job.setJobDesc(jobDesc);
+        Company company = companyServices.findById(companyId);
         job.setCompany(company);
-        jobServices.save(job);
+
+        Job savedJob = jobServices.save(job);
+
+        // Lưu các kỹ năng cho công việc
+        Set<JobSkill> jobSkills = new HashSet<>();
+        for (int i = 0; i < skills.size(); i++) {
+            JobSkill jobSkill = new JobSkill();
+            JobSkillId jobSkillId = new JobSkillId();
+            jobSkillId.setJobId(savedJob.getId());
+            jobSkillId.setSkillId(skills.get(i));
+            jobSkill.setId(jobSkillId);
+            jobSkill.setJob(savedJob);
+            jobSkill.setMoreInfos(moreInfos.get(i));
+            jobSkill.setSkill(skillService.findById(skills.get(i)));
+            jobSkill.setSkillLevel(SkillLevel.valueOf(skillLevels.get(i)));
+            jobSkills.add(jobSkill);
+            jobSkillServices.save(jobSkill);
+        }
+
+        savedJob.setJobSkills(jobSkills);
+        jobServices.save(savedJob);
+
         return "redirect:/jobs";
     }
+
+
 
 
     @RequestMapping(value = "/jobs/{jobId}/{candidateId}/send-email", method = RequestMethod.GET)
