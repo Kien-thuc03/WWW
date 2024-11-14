@@ -43,7 +43,6 @@ public class CandidateController {
         Page<Candidate> candidatePage = candidateServices.findAll(
                 currentPage - 1, pageSize,searchKeyword  , "id", "asc");
 
-
         model.addAttribute("candidatePage", candidatePage);
         model.addAttribute("search", searchKeyword);
 
